@@ -3,340 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Ettl Trainer Pro</title>
+    <title>Ettl Trainer - Master Edition Pro</title>
     <script src="audio_data.js"></script>
     <style>
         :root { 
-            --bg: #f0f2f5; 
-            --card: #ffffff; 
-            --accent: #4a90e2; 
-            --success: #47cf73;
-            --error: #ff6b6b;
-            --text: #333;
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); 
+            --glass: rgba(100, 116, 139, 0.9); 
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text: #ffffff;
+            --tab-color: #3b82f6; 
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; transition: background 1.2s ease; overflow: hidden; }
+        body { font-family: 'SF Pro Display', 'Segoe UI', sans-serif; background: var(--bg-gradient); min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
-        .card { background: var(--card); padding: 2.5rem; border-radius: 25px; text-align: center; width: 90%; max-width: 450px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); position: relative; z-index: 10; transition: transform 0.2s, background 0.3s; }
+        .progress-container { width: 100%; height: 8px; background: rgba(0,0,0,0.2); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--tab-color); transition: width 0.5s ease; }
+
+        .card { 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            padding: 2.2rem; border-radius: 35px; text-align: center; 
+            width: 90%; max-width: 420px; 
+            border: 2px solid var(--glass-border); 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15); 
+            position: relative; z-index: 10;
+            display: block; 
+            transition: all 0.3s ease;
+        }
         
-        .flash-success { background: #d4edda !important; transform: scale(1.02); border: 2px solid var(--success); }
-        .flash-error { background: #f8d7da !important; transform: scale(0.98); border: 2px solid var(--error); }
+        .stats { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 15px; color: #ffffff; font-size: 0.9rem; }
+        .streak-val { color: #f59e0b; }
 
-        .stats { display: flex; justify-content: space-between; font-weight: bold; color: var(--accent); margin-bottom: 20px; font-size: 1.1rem; }
+        .mode-select { display: flex; gap: 8px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 18px; }
+        .mode-btn { flex: 1; font-size: 0.75rem; padding: 12px; border: none; cursor: pointer; border-radius: 14px; background: transparent; font-weight: 800; color: rgba(255,255,255,0.6); transition: 0.3s; }
+        .mode-btn.active { background: var(--tab-color); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        #display-word { 
+            font-size: 2.5rem; font-weight: 900; margin: 1.2rem 0; min-height: 4.5rem; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3); color: #ffffff;
+            display: flex; align-items: center; justify-content: center; 
+            line-height: 1.1;
+        }
 
-        .mode-select { display: flex; gap: 8px; margin-bottom: 25px; background: #eee; padding: 6px; border-radius: 14px; }
-        .mode-btn { flex: 1; font-size: 0.7rem; padding: 10px; border: none; cursor: pointer; border-radius: 10px; background: transparent; font-weight: bold; color: #777; transition: 0.3s; }
-        .mode-btn.active { background: white; color: var(--accent); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
-
-        #display-word { font-size: 2.4rem; font-weight: bold; margin: 1.2rem 0; min-height: 4rem; display: flex; align-items: center; justify-content: center; line-height: 1.2; color: #212529; }
-        #feedback { font-size: 1.1rem; height: 1.6rem; margin-bottom: 15px; font-weight: bold; }
-
+        #feedback { font-size: 1.2rem; height: 1.8rem; margin-bottom: 15px; font-weight: 800; }
+        
         input { 
-            width: 100%; padding: 16px; border: 2px solid #ddd; border-radius: 16px; 
-            font-size: 1.3rem; outline: none; margin-bottom: 20px; text-align: center; 
-            transition: border-color 0.3s; 
+            width: 100%; padding: 18px; border: none; border-radius: 20px; 
+            font-size: 1.4rem; outline: none; margin-bottom: 20px; 
+            text-align: center; background: #ffffff; color: #1e293b; 
+            box-sizing: border-box; transition: 0.3s; font-weight: 700;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+            text-transform: lowercase; 
         }
-        input:focus { border-color: var(--accent); }
 
-        .controls { display: flex; gap: 12px; }
-        .btn-next { flex: 4; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 16px; font-size: 1.3rem; font-weight: bold; cursor: pointer; }
-        .btn-audio { flex: 1; background: #f0f0f0; border: none; border-radius: 16px; cursor: pointer; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; }
-
-        .footer { margin-top: 30px; font-size: 0.85rem; color: #ccc; letter-spacing: 0.5px; }
+        .controls { display: flex; gap: 15px; }
+        .btn-next { flex: 4; background: var(--tab-color); color: white; border: none; padding: 18px; border-radius: 20px; font-size: 1.3rem; font-weight: 800; cursor: pointer; }
+        .btn-audio { flex: 1; background: rgba(255,255,255,0.25); border-radius: 20px; border: 1px solid var(--glass-border); cursor: pointer; font-size: 1.8rem; color: white; display: flex; align-items: center; justify-content: center; }
+        
+        .footer { margin-top: 35px; font-size: 0.9rem; color: #ffffff; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; opacity: 0.9; }
         canvas#fw { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        
+        #finale { display: none; padding: 20px 0; }
+        .medal { font-size: 6rem; display: block; filter: drop-shadow(0 0 15px gold); }
+
+        .glow-correct { box-shadow: 0 0 50px #10b981 !important; transform: scale(1.02); }
+        .glow-wrong { box-shadow: 0 0 50px #ef4444 !important; transform: translateX(5px); }
     </style>
 </head>
 <body>
-
 <canvas id="fw"></canvas>
-
 <div class="card" id="main-card">
+    <div class="progress-container"><div id="progress-bar"></div></div>
     <div class="stats">
         <div>Score: <span id="count">0</span></div>
-        <div>Offen: <span id="rem">0</span></div>
+        <div>Streak: <span id="streak" class="streak-val">0</span> 🔥</div>
+        <div>Noch: <span id="rem">0</span></div>
     </div>
     
-    <div class="mode-select">
-        <button id="m-en" class="mode-btn active" onclick="setMode('EN_DE')">EN > DE</button>
-        <button id="m-de" class="mode-btn" onclick="setMode('DE_EN')">DE > EN</button>
-        <button id="m-au" class="mode-btn" onclick="setMode('AUDIO')">HÖREN</button>
+    <div id="game-ui">
+        <div class="mode-select">
+            <button id="m-en" class="mode-btn active" onclick="setMode('EN_DE')">EN > DE</button>
+            <button id="m-de" class="mode-btn" onclick="setMode('DE_EN')">DE > EN</button>
+            <button id="m-au" class="mode-btn" onclick="setMode('AUDIO')">HÖREN</button>
+        </div>
+        <div id="display-word">Lade...</div>
+        <div id="feedback"></div>
+        <input type="text" id="in" placeholder="Antwort..." 
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="controls">
+            <button class="btn-next" onclick="check()">PRÜFEN</button>
+            <button class="btn-audio" onclick="play()">🔊</button>
+        </div>
     </div>
 
-    <div id="display-word">Lade...</div>
-    <div id="feedback"></div>
-    
-    <input type="text" id="in" placeholder="Antwort..." autocomplete="off" autocapitalize="off" spellcheck="false" autocorrect="off">
-    
-    <div class="controls">
-        <button class="btn-next" onclick="check()">PRÜFEN</button>
-        <button class="btn-audio" onclick="play()">🔊</button>
+    <div id="finale">
+        <span class="medal">🥇</span>
+        <h2>YOU ARE THE CHAMP!</h2>
+        <p>Master Ettl Edition - Unit Complete!</p>
+        <button class="btn-next" onclick="location.reload()" style="width:100%; margin-top:25px;">NEUSTART</button>
     </div>
 
-    <div class="footer">Created by Master Ettl</div>
+    <div class="footer">MASTER ETTL EDITION</div>
 </div>
 
 <script>
-    // ==========================================================
-    // HIER DEINE LISTE AUS DER html_liste.txt EINFÜGEN:
-    // ==========================================================
     const raw = [
-        {en:"to win", de:"gewinnen; siegen"},
-{en:"practice", de:"Training; Übung"},
-{en:"to run around", de:"herumlaufen; herumrennen"},
-{en:"animal rescue shelter", de:"Tierheim"},
-{en:"animal", de:"Tier"},
-{en:"horse", de:"Pferd"},
-{en:"weekend", de:"Wochenende"},
-{en:"cinema", de:"Kino"},
-{en:"every", de:"jede"},
-{en:"month", de:"Monat"},
-{en:"science fiction", de:"Science-Fiction"},
-{en:"afternoon", de:"Nachmittag"},
-{en:"to meet", de:"(sich) treffen"},
-{en:"hair", de:"Haar; Haare"},
-{en:"height", de:"Höhe; Größe"},
-{en:"metre", de:"Meter"},
-{en:"tall", de:"groß"},
-{en:"best", de:"beste"},
-{en:"eleven", de:"elf"},
-{en:"twelve", de:"zwölf"},
-{en:"thirteen", de:"dreizehn"},
-{en:"fourteen", de:"vierzehn"},
-{en:"fifteen", de:"fünfzehn"},
-{en:"sixteen", de:"sechzehn"},
-{en:"seventeen", de:"siebzehn"},
-{en:"eighteen", de:"achtzehn"},
-{en:"nineteen", de:"neunzehn"},
-{en:"twenty", de:"zwanzig"},
-{en:"twenty-one", de:"einundzwanzig"},
-{en:"twenty-two", de:"zweiundzwanzig"},
-{en:"thirty", de:"dreißig"},
-{en:"forty", de:"vierzig"},
-{en:"fifty", de:"fünfzig"},
-{en:"sixty", de:"sechzig"},
-{en:"seventy", de:"siebzig"},
-{en:"eighty", de:"achtzig"},
-{en:"ninety", de:"neunzig"},
-{en:"one hundred", de:"einhundert"},
-{en:"guitar", de:"Gitarre"},
-{en:"to draw", de:"zeichnen"},
-{en:"judo", de:"Judo"},
-{en:"horse riding", de:"Reiten"},
-{en:"interview", de:"Interview; Befragung"},
-{en:"article", de:"Artikel; Bericht"},
-{en:"of course", de:"natürlich; selbstverständlich"},
-{en:"to practise", de:"üben; trainieren"},
-{en:"much", de:"viel"},
-{en:"so", de:"deshalb; also"},
-{en:"before", de:"bevor"},
-{en:"to get up", de:"aufstehen"},
-{en:"early", de:"früh"},
-{en:"morning", de:"Morgen; Vormittag"},
-{en:"usually", de:"normalerweise; gewöhnlich"},
-{en:"o'clock", de:"Uhr"},
-{en:"to have breakfast", de:"frühstücken"},
-{en:"quarter to", de:"Viertel vor"},
-{en:"tea", de:"Tee"},
-{en:"painting", de:"Malen; Gemälde"},
-{en:"fun", de:"Spaß; Freude"},
-{en:"hand", de:"Hand"},
-{en:"us", de:"uns"},
-{en:"together", de:"zusammen; gemeinsam"},
-{en:"match", de:"Wettkampf; Spiel"},
-{en:"half past", de:"halb"},
-{en:"past", de:"nach"},
-{en:"to", de:"vor"},
-{en:"a.m.", de:"vormittags"},
-{en:"p.m.", de:"nachmittags"},
-{en:"free time", de:"Freizeit"},
-{en:"after", de:"nach"},
-{en:"to watch TV", de:"fernsehen"},
-{en:"famous", de:"berühmt"},
-{en:"netball", de:"Korbball"},
-{en:"team", de:"Team; Mannschaft"},
-{en:"to brush one's teeth", de:"sich die Zähne putzen"},
-{en:"to get home", de:"nach Hause kommen"},
-{en:"to go to bed", de:"ins Bett gehen"},
-{en:"to go shopping", de:"einkaufen gehen"},
-{en:"to clean", de:"sauber machen; putzen"},
-{en:"to wake up", de:"aufwachen"},
-{en:"to hit snooze", de:"Schlummertaste drücken"},
-{en:"to take a shower", de:"duschen"},
-{en:"to get dressed", de:"sich anziehen"},
-{en:"downstairs", de:"unten; im Erdgeschoss"},
-{en:"Good morning", de:"Guten Morgen"},
-{en:"toast", de:"Toast"},
-{en:"juice", de:"Saft"},
-{en:"power", de:"Kraft; Macht; Stärke"},
-{en:"to take", de:"nehmen; mitnehmen"},
-{en:"to leave", de:"verlassen"},
-{en:"to start", de:"beginnen"},
-{en:"to walk", de:"gehen; laufen"},
-{en:"to play", de:"spielen"},
-{en:"to make my bed", de:"mein Bett machen"},
-{en:"to eat", de:"essen"},
-{en:"to drink", de:"trinken"},
-{en:"to go", de:"gehen; fahren"},
-{en:"to do my homework", de:"meine Hausaufgaben machen"},
-{en:"to sleep", de:"schlafen"},
-{en:"could", de:"könnte"},
-{en:"to go swimming", de:"schwimmen gehen"},
-{en:"swimming pool", de:"Schwimmbad"},
-{en:"to need", de:"brauchen"},
-{en:"swimming trunks", de:"Badehose"},
-{en:"no problem", de:"kein Problem"},
-{en:"to give", de:"geben"},
-{en:"fantastic", de:"fantastisch; großartig"},
-{en:"never", de:"nie; niemals"},
-{en:"to swim", de:"schwimmen"},
-{en:"some", de:"einige; ein paar"},
-{en:"many", de:"viele"},
-{en:"picnic", de:"Picknick"},
-{en:"me", de:"mir; mich"},
-{en:"you", de:"dir; dich"},
-{en:"him", de:"ihm; ihn"},
-{en:"her", de:"ihr; sie"},
-{en:"it", de:"ihm; es"},
-{en:"them", de:"ihnen; sie"},
-{en:"story", de:"Geschichte"},
-{en:"everybody", de:"jeder; alle"},
-{en:"to wash", de:"(sich) waschen; spülen"},
-{en:"face", de:"Gesicht"},
-{en:"again", de:"wieder; noch einmal"},
-{en:"work", de:"Arbeit"},
-{en:"to look after", de:"aufpassen; hüten"},
-{en:"bad", de:"schlecht"},
-{en:"to bark", de:"bellen"},
-{en:"to run away", de:"weglaufen"},
-{en:"to learn", de:"lernen"},
-{en:"trick", de:"Trick; Kunststück"},
-{en:"more", de:"mehr"},
-{en:"evening", de:"Abend"},
-{en:"to throw", de:"werfen"},
-{en:"shoe", de:"Schuh"},
-{en:"the fastest", de:"der/die/das schnellste"},
-{en:"race", de:"Rennen"}
+        {en:"to win", de:"gewinnen; siegen"}, {en:"practice", de:"Training; Übung"}, {en:"to run around", de:"herumlaufen; herumrennen"}, {en:"animal rescue shelter", de:"Tierheim"}, {en:"animal", de:"Tier"}, {en:"horse", de:"Pferd"}, {en:"weekend", de:"Wochenende"}, {en:"cinema", de:"Kino"}, {en:"every", de:"jede"}, {en:"month", de:"Monat"}, {en:"science fiction", de:"Science-Fiction"}, {en:"afternoon", de:"Nachmittag"}, {en:"to meet", de:"(sich) treffen"}, {en:"hair", de:"Haar; Haare"}, {en:"height", de:"Höhe; Größe"}, {en:"metre", de:"Meter"}, {en:"tall", de:"groß"}, {en:"best", de:"beste"}, {en:"eleven", de:"elf"}, {en:"twelve", de:"zwölf"}, {en:"thirteen", de:"dreizehn"}, {en:"fourteen", de:"vierzehn"}, {en:"fifteen", de:"fünfzehn"}, {en:"sixteen", de:"sechzehn"}, {en:"seventeen", de:"siebzehn"}, {en:"eighteen", de:"achtzehn"}, {en:"nineteen", de:"neunzehn"}, {en:"twenty", de:"zwanzig"}, {en:"twenty-one", de:"einundzwanzig"}, {en:"twenty-two", de:"zweiundzwanzig"}, {en:"thirty", de:"dreißig"}, {en:"forty", de:"vierzig"}, {en:"fifty", de:"fünfzig"}, {en:"sixty", de:"sechzig"}, {en:"seventy", de:"siebzig"}, {en:"eighty", de:"achtzig"}, {en:"ninety", de:"neunzig"}, {en:"one hundred", de:"einhundert"}, {en:"guitar", de:"Gitarre"}, {en:"to draw", de:"zeichnen"}, {en:"judo", de:"Judo"}, {en:"horse riding", de:"Reiten"}, {en:"interview", de:"Interview; Befragung"}, {en:"article", de:"Artikel; Bericht"}, {en:"of course", de:"natürlich; selbstverständlich"}, {en:"to practise", de:"üben; trainieren"}, {en:"much", de:"viel"}, {en:"so", de:"deshalb; also"}, {en:"before", de:"bevor"}, {en:"to get up", de:"aufstehen"}, {en:"early", de:"früh"}, {en:"morning", de:"Morgen; Vormittag"}, {en:"usually", de:"normalerweise; gewöhnlich"}, {en:"o'clock", de:"Uhr"}, {en:"to have breakfast", de:"frühstücken"}, {en:"quarter to", de:"Viertel vor"}, {en:"tea", de:"Tee"}, {en:"painting", de:"Malen; Gemälde"}, {en:"fun", de:"Spaß; Freude"}, {en:"hand", de:"Hand"}, {en:"us", de:"uns"}, {en:"together", de:"zusammen; gemeinsam"}, {en:"match", de:"Wettkampf; Spiel"}, {en:"half past", de:"halb"}, {en:"past", de:"nach"}, {en:"to", de:"vor"}, {en:"a.m.", de:"vormittags"}, {en:"p.m.", de:"nachmittags"}, {en:"free time", de:"Freizeit"}, {en:"after", de:"nach"}, {en:"to watch TV", de:"fernsehen"}, {en:"famous", de:"berühmt"}, {en:"netball", de:"Korbball"}, {en:"team", de:"Team; Mannschaft"}, {en:"to brush one's teeth", de:"sich die Zähne putzen"}, {en:"to get home", de:"nach Hause kommen"}, {en:"to go to bed", de:"ins Bett gehen"}, {en:"to go shopping", de:"einkaufen gehen"}, {en:"to clean", de:"sauber machen; putzen"}, {en:"to wake up", de:"aufwachen"}, {en:"to hit snooze", de:"Schlummertaste drücken"}, {en:"to take a shower", de:"duschen"}, {en:"to get dressed", de:"sich anziehen"}, {en:"downstairs", de:"unten; im Erdgeschoss"}, {en:"Good morning", de:"Guten Morgen"}, {en:"toast", de:"Toast"}, {en:"juice", de:"Saft"}, {en:"power", de:"Kraft; Macht; Stärke"}, {en:"to take", de:"nehmen; mitnehmen"}, {en:"to leave", de:"verlassen"}, {en:"to start", de:"beginnen"}, {en:"to walk", de:"gehen; laufen"}, {en:"to play", de:"spielen"}, {en:"to make my bed", de:"mein Bett machen"}, {en:"to eat", de:"essen"}, {en:"to drink", de:"trinken"}, {en:"to go", de:"gehen; fahren"}, {en:"to do my homework", de:"meine Hausaufgaben machen"}, {en:"to sleep", de:"schlafen"}, {en:"could", de:"könnte"}, {en:"to go swimming", de:"schwimmen gehen"}, {en:"swimming pool", de:"Schwimmbad"}, {en:"to need", de:"brauchen"}, {en:"swimming trunks", de:"Badehose"}, {en:"no problem", de:"kein Problem"}, {en:"to give", de:"geben"}, {en:"fantastic", de:"fantastisch; großartig"}, {en:"never", de:"nie; niemals"}, {en:"to swim", de:"schwimmen"}, {en:"some", de:"einige; ein paar"}, {en:"many", de:"viele"}, {en:"picnic", de:"Picknick"}, {en:"me", de:"mir; mich"}, {en:"you", de:"dir; dich"}, {en:"him", de:"ihm; ihn"}, {en:"her", de:"ihr; sie"}, {en:"it", de:"ihm; es"}, {en:"them", de:"ihnen; sie"}, {en:"story", de:"Geschichte"}, {en:"everybody", de:"jeder; alle"}, {en:"to wash", de:"(sich) waschen; spülen"}, {en:"face", de:"Gesicht"}, {en:"again", de:"wieder; noch einmal"}, {en:"work", de:"Arbeit"}, {en:"to look after", de:"aufpassen; hüten"}, {en:"bad", de:"schlecht"}, {en:"to bark", de:"bellen"}, {en:"to run away", de:"weglaufen"}, {en:"to learn", de:"lernen"}, {en:"trick", de:"Trick; Kunststück"}, {en:"more", de:"mehr"}, {en:"evening", de:"Abend"}, {en:"to throw", de:"werfen"}, {en:"shoe", de:"Schuh"}, {en:"the fastest", de:"der/die/das schnellste"}, {en:"race", de:"Rennen"}
     ];
-    // ==========================================================
 
-    let pool = [...raw];
-    let cur = null;
-    let mode = 'EN_DE';
-    let score = 0;
-    let audioCtx = null;
-    const colors = ["#e3f2fd", "#f1f8e9", "#fff3e0", "#f3e5f5", "#e0f2f1", "#fffde7", "#fce4ec"];
+    let pool = [...raw]; let total = raw.length; let cur = null; 
+    let mode = 'EN_DE'; let score = 0; let streak = 0; let audioCtx = null;
+    const tabColors = ["#3b82f6", "#f97316", "#db2777", "#10b981", "#8b5cf6", "#ef4444"];
 
-    function wake() {
-        try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            let o = audioCtx.createOscillator();
-            let g = audioCtx.createGain();
-            o.frequency.setValueAtTime(1, audioCtx.currentTime);
-            g.gain.setValueAtTime(0.001, audioCtx.currentTime);
-            o.connect(g); g.connect(audioCtx.destination);
-            o.start(); o.stop(audioCtx.currentTime + 0.1);
-        } catch(e){}
-    }
-
-    function setMode(m) {
-        mode = m;
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('m-' + (m==='EN_DE'?'en':m==='DE_EN'?'de':'au')).classList.add('active');
-        next();
+    function setMode(m) { 
+        mode = m; document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        const activeId = m === 'EN_DE' ? 'm-en' : (m === 'DE_EN' ? 'm-de' : 'm-au');
+        document.getElementById(activeId).classList.add('active'); 
+        next(); 
     }
 
     function play() {
         if (!cur) return;
-        const cleanKey = cur.en.toLowerCase().replace(/[?!.,']/g, "").trim();
-        if (typeof MASTER_ETTL_AUDIO !== 'undefined') {
-            const b64 = MASTER_ETTL_AUDIO[cleanKey] || MASTER_ETTL_AUDIO[cur.en.toLowerCase().trim()];
-            if (b64) {
-                wake();
-                setTimeout(() => { new Audio("data:audio/mp3;base64," + b64).play(); }, 150);
-            }
+        const key = cur.en.toLowerCase().replace(/[?!.,']/g, "").trim();
+        if (typeof MASTER_ETTL_AUDIO !== 'undefined' && MASTER_ETTL_AUDIO[key]) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            new Audio("data:audio/mp3;base64," + MASTER_ETTL_AUDIO[key]).play();
         }
     }
 
     function next() {
         if (pool.length === 0) {
-            document.getElementById('display-word').innerText = "🎉 Fertig!";
-            document.getElementById('in').style.display = "none";
+            document.getElementById('game-ui').style.display = "none";
+            document.getElementById('finale').style.display = "block";
+            document.getElementById('progress-bar').style.width = "100%";
+            setInterval(fire, 600);
             return;
         }
-        const idx = Math.floor(Math.random() * pool.length);
-        cur = pool[idx];
-
+        let progress = ((total - pool.length) / total) * 100;
+        document.getElementById('progress-bar').style.width = progress + "%";
+        cur = pool[Math.floor(Math.random() * pool.length)];
         document.getElementById('in').value = "";
         document.getElementById('feedback').innerText = "";
-        document.getElementById('main-card').className = "card";
         document.getElementById('rem').innerText = pool.length;
-
         if (mode === 'EN_DE') document.getElementById('display-word').innerText = cur.en;
         else if (mode === 'DE_EN') document.getElementById('display-word').innerText = cur.de;
-        else { document.getElementById('display-word').innerText = "🔊 ???"; play(); }
+        else { document.getElementById('display-word').innerText = "🔊 Listen..."; play(); }
+        setTimeout(() => document.getElementById('in').focus(), 100);
     }
 
     function check() {
-        let inputField = document.getElementById('in');
-        let val = inputField.value.toLowerCase().replace(/[?!.,']/g, "").trim();
-        
-        let targetEn = cur.en.toLowerCase().replace(/[?!.,']/g, "").trim();
-        let targetDe = cur.de.toLowerCase().replace(/[?!.,']/g, "").trim();
-        let target = (mode === 'DE_EN' || mode === 'AUDIO') ? targetEn : targetDe;
-        let displayTarget = (mode === 'DE_EN' || mode === 'AUDIO') ? cur.en : cur.de;
+        let inputVal = document.getElementById('in').value.trim();
+        if (!inputVal) return;
+        let target = (mode === 'DE_EN' || mode === 'AUDIO') ? cur.en : cur.de;
+        const feed = document.getElementById('feedback');
+        const card = document.getElementById('main-card');
 
-        let isCorrect = (val === target);
-
-        // AE / BE & "to" Logik
-        if (!isCorrect && (mode === 'DE_EN' || mode === 'AUDIO')) {
-            if ("to " + val === target || val === "to " + target) isCorrect = true;
-            let altVal = val.replace(/or$/, "our").replace(/our$/, "or").replace(/re$/, "er").replace(/er$/, "re").replace(/ize$/, "ise").replace(/ise$/, "ize");
-            if (altVal === target || "to " + altVal === target) isCorrect = true;
+        // Beseitigt iOS/Android-Probleme mit ß, Umlauten und Apostrophen
+        function normalize(s) {
+            return s.toLowerCase()
+                    .replace(/[’´`]/g, "'") 
+                    .replace(/ae/g, "ä").replace(/oe/g, "ö").replace(/ue/g, "ü").replace(/ss/g, "ß")
+                    .replace(/^to\s+/i, "") 
+                    .replace(/[?!.,]/g, "") 
+                    .trim();
         }
 
-        const card = document.getElementById('main-card');
-        const feed = document.getElementById('feedback');
+        let userVal = normalize(inputVal);
+        let targets = target.split(";").map(s => normalize(s));
+        
+        let isCorrect = targets.some(t => {
+            if (userVal === t) return true;
+            let alt = t.replace(/or$/, "our").replace(/our$/, "or").replace(/re$/, "er").replace(/er$/, "re").replace(/ize$/, "ise").replace(/ise$/, "ize");
+            return userVal === alt;
+        });
 
         if (isCorrect) {
-            score++;
-            const pIdx = pool.findIndex(i => i.en === cur.en);
-            if (pIdx !== -1) pool.splice(pIdx, 1);
-
-            card.classList.add('flash-success');
-            feed.innerText = "Richtig!";
-            feed.style.color = "var(--success)";
-            
-            if (score > 0 && score % 10 === 0) {
-                document.body.style.background = colors[Math.floor(Math.random()*colors.length)];
-                fire();
-            }
-            setTimeout(next, 700);
+            score++; streak++;
+            pool = pool.filter(i => i.en !== cur.en);
+            feed.innerText = "✓ Richtig!"; feed.style.color = "#10b981";
+            card.classList.add('glow-correct');
+            const colorIdx = Math.floor(score / 10) % tabColors.length;
+            document.documentElement.style.setProperty('--tab-color', tabColors[colorIdx]);
+            if (score % 10 === 0) fire();
+            setTimeout(() => { card.classList.remove('glow-correct'); next(); }, 800);
         } else {
-            card.classList.add('flash-error');
-            feed.innerText = "Lösung: " + displayTarget;
-            feed.style.color = "var(--error)";
-            if (mode === 'AUDIO') play();
-            setTimeout(next, 2200);
+            streak = 0;
+            feed.innerText = "✗ Lösung: " + target; feed.style.color = "#ef4444";
+            card.classList.add('glow-wrong');
+            setTimeout(() => { card.classList.remove('glow-wrong'); next(); }, 2500);
         }
         document.getElementById('count').innerText = score;
+        document.getElementById('streak').innerText = streak;
     }
 
     function fire() {
-        const c = document.getElementById('fw');
-        const x = c.getContext('2d');
+        const c = document.getElementById('fw'); const x = c.getContext('2d');
         c.width = window.innerWidth; c.height = window.innerHeight;
-        let p = [];
-        for(let i=0; i<120; i++) {
-            p.push({x:c.width/2, y:c.height/2, dx:(Math.random()-0.5)*14, dy:(Math.random()-0.5)*14, col:`hsl(${Math.random()*360},75%,60%)`, a:1});
+        let particles = [];
+        let originX = (pool.length === 0) ? Math.random() * c.width : c.width/2;
+        let originY = (pool.length === 0) ? Math.random() * c.height : c.height/2;
+        for(let i=0; i<80; i++) {
+            particles.push({x:originX, y:originY, dx:(Math.random()-0.5)*18, dy:(Math.random()-0.5)*18, col:`hsl(${Math.random()*360},80%,60%)`, a:1});
         }
         function draw() {
             x.clearRect(0,0,c.width,c.height);
-            p.forEach(i => {
-                i.x+=i.dx; i.y+=i.dy; i.dy+=0.18; i.a-=0.015;
-                x.globalAlpha=i.a; x.fillStyle=i.col;
-                x.beginPath(); x.arc(i.x,i.y,4,0,7); x.fill();
-            });
-            p = p.filter(i=>i.a>0);
-            if(p.length>0) requestAnimationFrame(draw);
+            particles.forEach(p => { p.x+=p.dx; p.y+=p.dy; p.dy+=0.25; p.a-=0.015; x.globalAlpha=p.a; x.fillStyle=p.col; x.beginPath(); x.arc(p.x,p.y,4,0,7); x.fill(); });
+            particles = particles.filter(p=>p.a>0);
+            if(particles.length>0) requestAnimationFrame(draw);
         }
         draw();
     }
